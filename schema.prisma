@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  company_id          Int      @id @default(autoincrement())
+  company_name        String
+  company_description String
+  company_tittle      String
+  company_logo        String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  BranchCompanyId Branch[] @relation("Branch_CompanyId")
+
+  RoleCompanyId Role[] @relation("Role_CompanyId")
+
+  UserCompanyId UserTable[] @relation("User_CompanyId")
+}
+
+model Branch {
+  branch_id       Int      @id @default(autoincrement())
+  branch_name     String
+  BranchCompanyId Company  @relation("Branch_CompanyId", fields: [company_id], references: [company_id])
+  company_id      Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  UserBranchId UserTable[] @relation("User_BranchId")
+}
+
+model Role {
+  role_id       Int      @id @default(autoincrement())
+  role_name     String
+  RoleCompanyId Company  @relation("Role_CompanyId", fields: [company_id], references: [company_id])
+  company_id    Int
+  permission    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  UserRoleId UserTable[] @relation("User_RoleId")
+}
+
+model UserTable {
+  user_id       Int    @id @default(autoincrement())
+  firstname     String
+  lastname      String
+  password      String
+  mobile_number String
+  token         String
+
+  UserCompanyId Company @relation("User_CompanyId", fields: [company_id], references: [company_id])
+  company_id    Int
+  company_name  String
+
+  UserBranchId Branch @relation("User_BranchId", fields: [branch_id], references: [branch_id])
+  branch_id    Int
+  branch_name  String
+
+  UserRoleId Role   @relation("User_RoleId", fields: [role_id], references: [role_id])
+  role_id    Int
+  role_name  String
+
+  createdAt DateTime @default(now())
+  UpdatedAt DateTime @updatedAt
+}
